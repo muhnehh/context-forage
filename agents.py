@@ -17,10 +17,11 @@ class AgentState(TypedDict):
     reasoning_trace: List[Dict[str, Any]]
 
 class MultiAgentSystem:
-    def __init__(self, model_name: str = "gpt-4o-mini", max_iterations: int = 3):
+    def __init__(self, model_name: str = "gpt-4o-mini", max_iterations: int = 3, epsilon: float = 1.0):
         self.llm = ChatOpenAI(model=model_name, temperature=0.7)
-        self.mcp = MCPSimulator(epsilon=1.0)
+        self.mcp = MCPSimulator(epsilon=epsilon)
         self.max_iterations = max_iterations
+        self.epsilon = epsilon
         self.graph = self._build_graph()
     
     def _gap_detector(self, state: AgentState) -> AgentState:
@@ -42,7 +43,7 @@ class MultiAgentSystem:
         ])
         
         response = self.llm.invoke(prompt.format_messages(documents=docs_text))
-        gaps_text = response.content
+        gaps_text = str(response.content)
         
         gaps = [line.strip() for line in gaps_text.split('\n') if line.strip() and not line.startswith('#')]
         gaps = [g for g in gaps if len(g) > 20][:5]
@@ -181,7 +182,7 @@ Generate a hypothesis and 24h MVP proposal:""")
             response = self.llm.invoke(prompt.format_messages(proposal=hypo["proposal"]))
             
             try:
-                score = float(response.content.strip().split()[0])
+                score = float(str(response.content).strip().split()[0])
                 score = max(0.0, min(10.0, score))
             except:
                 score = 5.0
@@ -231,7 +232,7 @@ Generate a hypothesis and 24h MVP proposal:""")
         
         return state
     
-    def _build_graph(self) -> StateGraph:
+    def _build_graph(self):
         workflow = StateGraph(AgentState)
         
         workflow.add_node("gap_detector", self._gap_detector)

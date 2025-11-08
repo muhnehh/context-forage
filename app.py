@@ -80,7 +80,7 @@ if uploaded_files:
     
     if st.button("🚀 Run Multi-Agent Analysis", type="primary", use_container_width=True):
         with st.spinner("🔄 Processing documents with differential privacy..."):
-            processor = DocumentProcessor()
+            processor = DocumentProcessor(epsilon=epsilon)
             processed_docs = []
             
             os.makedirs("temp_uploads", exist_ok=True)
@@ -122,7 +122,8 @@ if uploaded_files:
             with st.spinner("🧠 Initializing multi-agent system..."):
                 agent_system = MultiAgentSystem(
                     model_name=model_choice,
-                    max_iterations=max_iterations
+                    max_iterations=max_iterations,
+                    epsilon=epsilon
                 )
             
             with reasoning_container:

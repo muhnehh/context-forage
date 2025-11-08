@@ -9,13 +9,13 @@ class MCPSimulator:
         self.context_store: Dict[str, Dict[str, Any]] = {}
         self.message_history: List[Dict[str, Any]] = []
     
-    def create_context(self, agent_name: str, data: Any) -> str:
+    def create_context(self, agent_name: str, data: Any, add_noise: bool = True) -> str:
         context_id = f"{agent_name}_{uuid.uuid4().hex[:8]}"
         
         envelope = self.privacy_layer.create_mcp_envelope(
             context_id=context_id,
             data=data,
-            add_noise=False
+            add_noise=add_noise
         )
         
         self.context_store[context_id] = {
@@ -33,7 +33,7 @@ class MCPSimulator:
         data: Any,
         apply_privacy: bool = True
     ) -> Dict[str, Any]:
-        context_id = self.create_context(from_agent, data)
+        context_id = self.create_context(from_agent, data, add_noise=apply_privacy)
         
         message = {
             "from": from_agent,

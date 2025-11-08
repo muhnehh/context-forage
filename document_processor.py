@@ -7,7 +7,7 @@ from langchain_openai import OpenAIEmbeddings
 from privacy_layer import PrivacyLayer
 
 class DocumentProcessor:
-    def __init__(self, chunk_size: int = 1000, chunk_overlap: int = 200):
+    def __init__(self, chunk_size: int = 1000, chunk_overlap: int = 200, epsilon: float = 1.0):
         self.chunk_size = chunk_size
         self.chunk_overlap = chunk_overlap
         self.text_splitter = RecursiveCharacterTextSplitter(
@@ -15,7 +15,7 @@ class DocumentProcessor:
             chunk_overlap=chunk_overlap
         )
         self.embeddings_model = OpenAIEmbeddings()
-        self.privacy_layer = PrivacyLayer(epsilon=1.0)
+        self.privacy_layer = PrivacyLayer(epsilon=epsilon)
     
     def load_pdf(self, file_path: str) -> str:
         reader = PdfReader(file_path)
