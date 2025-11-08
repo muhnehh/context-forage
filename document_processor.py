@@ -2,7 +2,7 @@ from typing import List, Dict, Any
 from PyPDF2 import PdfReader
 from docx import Document
 import os
-from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_openai import OpenAIEmbeddings
 from privacy_layer import PrivacyLayer
 

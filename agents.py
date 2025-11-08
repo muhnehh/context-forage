@@ -1,6 +1,6 @@
 from typing import Dict, Any, List, TypedDict
 from langchain_openai import ChatOpenAI
-from langchain.prompts import ChatPromptTemplate
+from langchain_core.prompts import ChatPromptTemplate
 from langgraph.graph import StateGraph, END
 from mcp_simulator import MCPSimulator
 import json
