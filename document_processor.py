@@ -3,19 +3,54 @@ from PyPDF2 import PdfReader
 from docx import Document
 import os
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain_openai import OpenAIEmbeddings
 from privacy_layer import PrivacyLayer
+import logging
+
+logger = logging.getLogger(__name__)
 
 class DocumentProcessor:
+    """
+    Process documents with free embeddings using HuggingFace.
+    No API keys required - uses open-source models.
+    """
+    
     def __init__(self, chunk_size: int = 1000, chunk_overlap: int = 200, epsilon: float = 1.0):
+        """
+        Initialize document processor with free HuggingFace embeddings.
+        
+        Args:
+            chunk_size: Size of text chunks
+            chunk_overlap: Overlap between chunks
+            epsilon: Privacy budget for differential privacy
+        """
         self.chunk_size = chunk_size
         self.chunk_overlap = chunk_overlap
         self.text_splitter = RecursiveCharacterTextSplitter(
             chunk_size=chunk_size,
             chunk_overlap=chunk_overlap
         )
-        self.embeddings_model = OpenAIEmbeddings()
+        
+        # Lazy load embeddings - only when needed for better startup speed
+        self.embeddings_model = None
+        self._embeddings_loaded = False
+        
         self.privacy_layer = PrivacyLayer(epsilon=epsilon)
+    
+    def _ensure_embeddings_loaded(self):
+        """Lazy load embeddings only when needed."""
+        if not self._embeddings_loaded:
+            try:
+                # Import only when needed (not on module load)
+                from langchain_huggingface import HuggingFaceEmbeddings
+                self.embeddings_model = HuggingFaceEmbeddings(
+                    model_name="sentence-transformers/all-MiniLM-L6-v2",
+                    model_kwargs={"device": "cpu"}
+                )
+                self._embeddings_loaded = True
+                logger.info("Loaded HuggingFace embeddings model")
+            except Exception as e:
+                logger.error(f"Error loading embeddings: {e}")
+                raise
     
     def load_pdf(self, file_path: str) -> str:
         reader = PdfReader(file_path)
@@ -46,6 +81,7 @@ class DocumentProcessor:
         return chunks
     
     def create_embeddings(self, texts: List[str], use_privacy: bool = True) -> List[List[float]]:
+        self._ensure_embeddings_loaded()  # Lazy load if not already loaded
         embeddings = self.embeddings_model.embed_documents(texts)
         
         if use_privacy:
