@@ -124,6 +124,8 @@ python test_real_mcp.py
 
 <img width="1098" height="751" alt="image" src="https://github.com/user-attachments/assets/0cfc0002-e56d-49d4-aa68-022274cc80dd" />
 <img width="1099" height="793" alt="image" src="https://github.com/user-attachments/assets/193a7bf3-53f9-408d-95ab-f97f481cc465" />
+
+It produces an output in pdf format:
 [ContextForge_Analysis_20251109_141448.pdf](https://github.com/user-attachments/files/23439157/ContextForge_Analysis_20251109_141448.pdf)
 
 ## Performance
